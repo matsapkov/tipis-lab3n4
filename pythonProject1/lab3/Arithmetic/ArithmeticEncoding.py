@@ -1,67 +1,58 @@
 from decimal import Decimal, getcontext
-getcontext().prec = 50  # Устанавливаем точность Decimal до 500 знаков после запятой для точных вычислений с плавающей запятой.
+getcontext().prec = 50
 
 
 class ArithmeticEncode:
     def __init__(self, data):
-        self.data = data  # Сохраняем входные данные (строку, которую нужно закодировать).
-        self.left = Decimal(0.0)  # Начальное значение левой границы интервала.
-        self.right = Decimal(1.0)  # Начальное значение правой границы интервала.
+        self.data = data
+        self.left = Decimal(0.0)
+        self.right = Decimal(1.0)
 
     def define_alph(self):
-        '''
-        Функция для формирования алфавита (словаря) фразы и подсчета количества использований каждого символа.
-        '''
-        alphabet = {}  # Создаем пустой словарь для хранения символов и их частот.
-        for char in self.data:  # Проходим по каждому символу строки.
-            if char not in alphabet:  # Если символ еще не встречался, добавляем его в словарь.
-                alphabet[char] = 1  # Инициализируем его количество как 1.
+        alphabet = {}
+        for char in self.data:
+            if char not in alphabet:
+                alphabet[char] = 1
             else:
-                alphabet[char] += 1  # Если символ уже встречался, увеличиваем счетчик.
-        return alphabet  # Возвращаем словарь, содержащий частоту каждого символа.
+                alphabet[char] += 1
+        return alphabet
 
     def define_frequency(self):
-        '''
-        Функция для формирования словаря, содержащего частоту каждого символа.
-        '''
-        frequencies = {}  # Создаем пустой словарь для хранения частот символов.
-        length = len(self.data)  # Получаем длину строки для вычисления относительных частот.
-        alphabet = self.define_alph()  # Получаем алфавит с частотой каждого символа.
-        for letter, count in alphabet.items():  # Проходим по символам и их количествам.
-            frequencies[letter] = count / length  # Рассчитываем частоту как количество / общая длина строки.
-        return frequencies  # Возвращаем словарь с частотами символов.
+        frequencies = {}
+        length = len(self.data)
+        alphabet = self.define_alph()
+        for letter, count in alphabet.items():
+            frequencies[letter] = count / length
+        return frequencies
 
     def define_additional_frequencies(self):
-        '''
-        Функция для вычисления накопительных вероятностей для каждого символа.
-        '''
-        additional_frequencies = {}  # Создаем пустой словарь для хранения накопительных вероятностей.
-        cumulative_sum = 0.0  # Инициализируем начальную накопительную сумму как 0.
-        freq_s = self.define_frequency()  # Получаем частоты символов.
+        additional_frequencies = {}
+        cumulative_sum = 0.0
+        freq_s = self.define_frequency()
 
-        for letter, freq in freq_s.items():  # Проходим по каждому символу и его частоте.
-            additional_frequencies[letter] = cumulative_sum  # Назначаем текущую накопленную вероятность.
-            cumulative_sum += freq  # Обновляем накопленную сумму, добавляя текущую частоту.
+        for letter, freq in freq_s.items():
+            additional_frequencies[letter] = cumulative_sum
+            cumulative_sum += freq
 
-        return additional_frequencies  # Возвращаем словарь с накопительными вероятностями для каждого символа.
+        return additional_frequencies
 
     def encode(self):
-        freq_s = self.define_frequency()  # Получаем частоты символов.
-        add_freqs = self.define_additional_frequencies()  # Получаем накопительные вероятности.
+        freq_s = self.define_frequency()
+        add_freqs = self.define_additional_frequencies()
 
-        for char in self.data:  # Проходим по каждому символу строки.
-            add_left_freq = Decimal(add_freqs[char])  # Получаем накопленную вероятность для символа (левая граница).
+        for char in self.data:
+            add_left_freq = Decimal(add_freqs[char])
             add_right_freq = Decimal(add_left_freq) + Decimal(
-                freq_s[char])  # Вычисляем правую границу (накопленная + частота).
+                freq_s[char])
 
-            current_range = self.right - self.left  # Вычисляем текущий диапазон (разницу между правой и левой границами).
-            self.right = self.left + current_range * add_right_freq  # Обновляем правую границу интервала.
-            self.left = self.left + current_range * add_left_freq  # Обновляем левую границу интервала.
+            current_range = self.right - self.left
+            self.right = self.left + current_range * add_right_freq
+            self.left = self.left + current_range * add_left_freq
 
-        return (self.left + self.right) / 2  # Возвращаем среднее значение между левой и правой границами как результат кодирования.
+        return (self.left + self.right) / 2
 
-# Чтение фразы из файла
-with open('../text.txt', 'r', encoding='utf-8') as file:
+
+with open('text.txt', 'r', encoding='utf-8') as file:
     data = file.read()
 
 code = ArithmeticEncode(data)

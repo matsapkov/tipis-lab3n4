@@ -1,5 +1,5 @@
 from decimal import Decimal, getcontext
-from lab3.Arithmetic.ArithmeticEncoding import ArithmeticEncode  # Импортируем класс ArithmeticEncode для кодирования строки.
+from pythonProject1.lab3.Arithmetic.ArithmeticEncoding import ArithmeticEncode  # Импортируем класс ArithmeticEncode для кодирования строки.
 getcontext().prec = 350  # Устанавливаем точность вычислений для Decimal на 350 знаков.
 
 
@@ -12,9 +12,6 @@ class ArithmeticDecode:
         self.left = Decimal(0.0)  # Начальная левая граница интервала для декодирования.
 
     def define_additional_frequencies(self):
-        '''
-        Функция для вычисления накопительных вероятностей для каждого символа.
-        '''
         additional_frequencies = {}  # Создаем пустой словарь для хранения накопительных вероятностей.
         cumulative_sum = 0.0  # Инициализируем накопленную сумму как 0.
         freq_s = self.frequencies  # Получаем словарь частот символов.
@@ -49,7 +46,7 @@ class ArithmeticDecode:
 
 
 # Чтение фразы из файла
-with open('../text.txt', 'r', encoding='utf-8') as file:
+with open('text.txt', 'r', encoding='utf-8') as file:
     data = file.read()
 
 
